@@ -1,0 +1,21 @@
+{
+  "name": "@dsh-security/attack-alert",
+  "description": "dsh security suite: attack-alert module. Sends an email via SMTP to a configured inbox whenever another security module reports a triggered protection.",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-settings": "^0.1.1-rc.2",
+    "@deepseek-ai/dsh-security/core": "0.1.0",
+    "@deepseek-ai/schemastery": "^2.0.0"
+  }
+}

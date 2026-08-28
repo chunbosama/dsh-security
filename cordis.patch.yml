@@ -1,0 +1,57 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# dsh security suite — profile overlay.
+#
+# Apply this to the web profile by appending it to
+#   $DSH_HOME/profiles/web/cordis.patch.yml
+# (or pass it via `dsh --profile web --patch ./cordis.patch.yml`).
+#
+# Every entry is a separate Cordis plugin, following the everything-is-a-plugin
+# philosophy: install only the modules you want. `security-core` is required by
+# the others and provides the shared admin-password vault, IP tracker, module
+# registry and alert dispatch. `security-control-panel` is the Settings page
+# that lists the installed modules and manages the admin password.
+# ─────────────────────────────────────────────────────────────────────────────
+- insert:
+    # Core: shared registry / password vault / IP tracker / alert dispatch.
+    - id: security-core
+      name: '@dsh-security/core'
+
+    # Sub-modules (each optional; remove the row to disable the module).
+    - id: security-attack-alert
+      name: '@dsh-security/attack-alert'
+      config:
+        smtpHost: ''
+        smtpPort: 25
+        from: 'dsh-security@localhost'
+        to: ''
+        enabled: true
+
+    - id: security-file-protect
+      name: '@dsh-security/file-protect'
+      config:
+        enabled: true
+        intervalSeconds: 60
+        files: []
+
+    - id: security-command-protect
+      name: '@dsh-security/command-protect'
+      config:
+        enabled: true
+        dangerThreshold: 50
+        rules: []
+
+    - id: security-ip-protect
+      name: '@dsh-security/ip-protect'
+      config:
+        enabled: true
+
+    - id: security-api-protect
+      name: '@dsh-security/api-protect'
+      config:
+        enabled: true
+        fakeStrangers: true
+        alertOnStranger: true
+
+    # Control panel: Settings -> Security page (dual-face host+client package).
+    - id: security-control-panel
+      name: '@dsh-security/control-panel'
