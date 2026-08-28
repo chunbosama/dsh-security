@@ -1,5 +1,11 @@
 # dsh-security — pluggable security suite for DeepSeek Harness (dsh)
 
+> **简体中文**：中文版说明见 [`README.zh.md`](./README.zh.md)。
+
+---
+
+
+
 A **everything-is-a-plugin** security suite for dsh. Each capability is an
 independent Cordis plugin that can be installed, replaced, upgraded or disabled
 on its own. A small **core** plugin provides the shared infrastructure; the

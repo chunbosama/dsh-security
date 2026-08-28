@@ -56,8 +56,8 @@ function apply(ctx, config = {}) {
 
     const unregister = sec.registerModule({
       id: "file-protect",
-      name: "关键文件保护 (Critical File Protection)",
-      description: "Periodically checks the MD5 of critical dsh files and alerts when a file is modified.",
+      name: "关键文件保护",
+      description: "定时检测 dsh 关键文件的 MD5，并在文件被修改时发出告警。",
       version: "0.1.0",
       category: "file",
       enabled: scoped.get().enabled !== false,
@@ -78,7 +78,7 @@ function apply(ctx, config = {}) {
         try {
           current = await fileMd5(file);
         } catch {
-          // file absent: not a modification event
+          // 文件不存在：不算修改事件
           continue;
         }
         const prev = baselines[file];
@@ -88,11 +88,11 @@ function apply(ctx, config = {}) {
         }
         if (prev !== current) {
           // Do NOT auto-update the baseline: keep flagging until an admin re-baselines.
-          ctx.logger?.warn?.(`[dsh-security.file-protect] CRITICAL FILE CHANGED: ${file} (${prev} -> ${current})`);
+          ctx.logger?.warn?.(`[dsh-security.file-protect] 关键文件被修改: ${file} (${prev} -> ${current})`);
           await sec.alert({
             type: "critical-file-modified",
             path: file,
-            details: `MD5 changed: ${prev} -> ${current}. If this change was legitimate, run security_rescan_baselines or edit the module settings to re-baseline.`,
+            details: `MD5 发生变化：${prev} -> ${current}。若此为正常变更，请将模块设置中的 rescanBaseline 置为 true 以重新建立基线。`,
             time: new Date().toISOString(),
           }).catch(() => {});
         }

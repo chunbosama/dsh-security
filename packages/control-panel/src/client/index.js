@@ -1,27 +1,21 @@
 /**
- * Control-panel client half.
+ * 控制面板 - 浏览器端实现。
  *
- * Registers a "Security" page under Settings (`settings.section` id `security`)
- * that:
- *   - lists every installed security module (read from the `dsh-security`
- *     settings namespace roster maintained by the core plugin),
- *   - lets the admin set/change the admin password (written as a pending,
- *     write-only field that the core hashes host-side), and
- *   - manages the trusted-IP allowlist.
+ * 在“设置”中注册“安全中心”页面（settings.section，id=security），实现：
+ *   - 列出所有已安装的安全模块（读取核心插件维护在 dsh-security 设置命名空间中的模块清单）；
+ *   - 设置/修改管理员密码（写入 pending 明文字段，由核心插件在服务端哈希存储）；
+ *   - 维护可信 IP 列表。
  *
- * NOTE: this source is plain ES (no JSX/TypeScript) and must be bundled to
- * `lib/client.js` with the DSH client build pipeline (tsdown), like every
- * other dsh client plugin. The `window.__ModuleLoader__.load(...)` wrapper is
- * produced by that build; it is not hand-authored here.
+ * 说明：本源码为纯 ES（无 JSX/TypeScript），需像其它 dsh 客户端插件一样，通过 DSH 客户端构建
+ * 管线（tsdown）打包为 lib/client.js（其 window.__ModuleLoader__.load(...) 包装由构建产生）。
  */
 import React from "react";
 
 const NS = "dsh-security";
-const NS_LABEL = "Security";
+const NS_LABEL = "安全中心";
 
 function apply(ctx) {
   const scope = ctx.settingsScope.bind({ namespace: NS });
-  const t = ctx.locale ? ctx.locale.bind("settings.security") : (s) => s;
 
   const face = () => ({ hooks: { security: {
     getSnapshot: () => scope.getSnapshot(),
@@ -75,45 +69,51 @@ function SecuritySection(props) {
     security.actions.markTrusted(newIp.trim()).then(() => setNewIp(""));
   };
 
-  return React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20, maxWidth: 640 } },
+  const rowStyle = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid var(--dsw-alias-border, #eee)" };
+
+  return React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 24, maxWidth: 680 } },
     React.createElement("section", null,
-      React.createElement("h3", null, "Admin password"),
+      React.createElement("h3", null, "管理员密码"),
       hasPassword
-        ? React.createElement("p", null, "An admin password is configured.")
-        : React.createElement("p", null, "No admin password is set. Set one to enable password-gated protections."),
+        ? React.createElement("p", null, "已配置管理员密码。")
+        : React.createElement("p", null, "尚未设置管理员密码。设置后即可启用基于密码的安全防护。"),
       React.createElement("form", { onSubmit: onSetPassword, style: { display: "flex", gap: 8 } },
         React.createElement("input", {
-          type: "password", value: pw, placeholder: "New admin password",
+          type: "password", value: pw, placeholder: "新管理员密码",
           onChange: (e) => setPw(e.target.value), style: { flex: 1 },
         }),
-        React.createElement("button", { type: "submit" }, hasPassword ? "Change password" : "Set password"),
+        React.createElement("button", { type: "submit" }, hasPassword ? "修改密码" : "设置密码"),
       ),
     ),
+
     React.createElement("section", null,
-      React.createElement("h3", null, "Installed security modules"),
+      React.createElement("h3", null, "已安装的安全模块"),
       modules.length === 0
-        ? React.createElement("p", null, "No security modules are installed.")
-        : React.createElement("ul", null,
-            modules.map((m) => React.createElement("li", { key: m.id },
+        ? React.createElement("p", null, "尚未安装任何安全模块。")
+        : React.createElement("ul", { style: { listStyle: "none", margin: 0, padding: 0 } },
+            modules.map((m) => React.createElement("li", { key: m.id, style: rowStyle },
               React.createElement("strong", null, m.name || m.id),
-              m.description ? React.createElement("span", { style: { marginLeft: 8, opacity: 0.7 } }, m.description) : null,
+              m.description
+                ? React.createElement("span", { style: { marginLeft: 8, opacity: 0.7, fontSize: 13 } }, m.description)
+                : null,
             ))),
     ),
+
     React.createElement("section", null,
-      React.createElement("h3", null, "Trusted IPs"),
+      React.createElement("h3", null, "可信 IP 列表"),
       trustedIps.length === 0
-        ? React.createElement("p", null, "No trusted IPs added.")
-        : React.createElement("ul", null,
-            trustedIps.map((ip) => React.createElement("li", { key: ip },
-              ip,
-              React.createElement("button", { onClick: () => security.actions.unmarkTrusted(ip), style: { marginLeft: 8 } }, "Remove"),
+        ? React.createElement("p", null, "尚未添加可信 IP。")
+        : React.createElement("ul", { style: { listStyle: "none", margin: 0, padding: 0 } },
+            trustedIps.map((ip) => React.createElement("li", { key: ip, style: rowStyle },
+              React.createElement("code", null, ip),
+              React.createElement("button", { onClick: () => security.actions.unmarkTrusted(ip) }, "移除"),
             ))),
       React.createElement("form", { onSubmit: onAddTrusted, style: { display: "flex", gap: 8 } },
         React.createElement("input", {
-          type: "text", value: newIp, placeholder: "IP address (e.g. 192.168.1.5)",
+          type: "text", value: newIp, placeholder: "IP 地址（例如 192.168.1.5）",
           onChange: (e) => setNewIp(e.target.value), style: { flex: 1 },
         }),
-        React.createElement("button", { type: "submit" }, "Add trusted IP"),
+        React.createElement("button", { type: "submit" }, "添加可信 IP"),
       ),
     ),
   );

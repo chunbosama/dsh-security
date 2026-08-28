@@ -23,7 +23,7 @@ function isLoopback(ip) {
 function apply(ctx, config = {}) {
   const sec = ctx.get("security");
   if (!sec) {
-    ctx.logger?.warn?.("[dsh-security.ip-protect] core not mounted; module idle");
+    ctx.logger?.warn?.("[dsh-security.ip-protect] 核心模块未挂载；本模块空闲");
     return;
   }
   const alerted = new Map(); // ip -> timestamp
@@ -32,8 +32,8 @@ function apply(ctx, config = {}) {
   ctx.inject(["webServer"], (tctx) => {
     const unregister = sec.registerModule({
       id: "ip-protect",
-      name: "陌生 IP 保护 (Strange IP Protection)",
-      description: "Learns common IPs from /api traffic, flags stranger conversations and emails the admin to add the IP to the trusted list.",
+      name: "陌生 IP 保护",
+      description: "通过分析 /api 流量学习常用 IP，发现陌生 IP 发起对话时发邮件提醒管理员将 IP 加入可信列表。",
       version: "0.1.0",
       category: "ip",
       enabled: config.enabled !== false,
@@ -64,10 +64,10 @@ function apply(ctx, config = {}) {
       sec.alert({
         type: "stranger-ip-conversation",
         ip,
-        endpoint: method || "(websocket)",
-        details: `A stranger IP (${ip}) started a conversation on ${method || "the websocket"} (${kind}). ` +
-          `If this is a legitimate user, add ${ip} to the trusted IP list in the Security control panel. ` +
-          `Until then, its requests are answered with meaningless data.`,
+        endpoint: method || "WebSocket",
+        details: `陌生 IP（${ip}）在 ${method || "WebSocket"} 上发起了一次对话（${kind}）。` +
+          `若为正常用户，请在“安全中心”控制面板中将 ${ip} 加入可信 IP 列表；` +
+          `在此之前，其请求将被返回无意义的数据。`,
         time: new Date().toISOString(),
       }).catch(() => {});
     };

@@ -120,7 +120,7 @@ async function forward(req, res, delegate, maxBytes) {
 function apply(ctx, config = {}) {
   const sec = ctx.get("security");
   if (!sec) {
-    ctx.logger?.warn?.("[dsh-security.api-protect] core not mounted; module idle");
+    ctx.logger?.warn?.("[dsh-security.api-protect] 核心模块未挂载；本模块空闲");
     return;
   }
   const scoped = {};
@@ -131,8 +131,8 @@ function apply(ctx, config = {}) {
     const delegate = toFetchHandler(tctx.apiProxy);
     const unregister = sec.registerModule({
       id: "api-protect",
-      name: "API 保护 (API Protection)",
-      description: "Answers /api/* requests from unauthenticated or strange-IP callers with random, meaningless data.",
+      name: "API 保护",
+      description: "对来自未登录或陌生 IP 的 /api/* 请求，返回随机无意义的数据以迷惑攻击者。",
       version: "0.1.0",
       category: "api",
       enabled: config.enabled !== false,
@@ -159,7 +159,7 @@ function apply(ctx, config = {}) {
                 type: "api-protect:stranger-ip",
                 ip,
                 endpoint: method,
-                details: `Unauthenticated/stranger IP ${ip} attempted ${method}. If this is a legitimate user, add the IP to the trusted list in the Security control panel.`,
+                details: `未登录/陌生 IP（${ip}）尝试访问 ${method}。若为正常用户，请在“安全中心”控制面板中将该 IP 加入可信列表。`,
                 time: new Date().toISOString(),
               }).catch(() => {});
             }

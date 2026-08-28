@@ -130,16 +130,16 @@ async function sendMail(cfg, message) {
 function buildMessage(cfg, payload) {
   const time = payload.time || new Date().toISOString();
   const lines = [
-    `Attack type    : ${payload.type}`,
-    `Time (UTC)     : ${time}`,
-    `Source IP      : ${payload.ip || "unknown"}`,
-    `Caller agent   : ${payload.agent || "unknown"}`,
-    `Tool/Command   : ${payload.command || "n/a"}`,
-    `File path      : ${payload.path || "n/a"}`,
-    `API endpoint   : ${payload.endpoint || "n/a"}`,
+    `攻击类型      : ${payload.type}`,
+    `时间 (UTC)     : ${time}`,
+    `来源 IP        : ${payload.ip || "未知"}`,
+    `调用方 agent   : ${payload.agent || "未知"}`,
+    `工具/命令      : ${payload.command || "无"}`,
+    `文件路径       : ${payload.path || "无"}`,
+    `API 端点       : ${payload.endpoint || "无"}`,
     ``,
-    `Details:`,
-    payload.details || "(none)",
+    `详情：`,
+    payload.details || "(无)",
   ];
   const text = lines.join("\n");
   const subject = `[dsh-security] ${payload.type}`;
@@ -190,8 +190,8 @@ function apply(ctx, config = {}) {
 
   const unregister = sec.registerModule({
     id: "attack-alert",
-    name: "攻击提醒 (Attack Alert)",
-    description: "Sends an SMTP email to a configured inbox when another security module reports a triggered protection.",
+    name: "攻击提醒",
+    description: "当其它安全模块触发保护时，向配置的邮箱发送一封 SMTP 邮件提醒管理员。",
     version: "0.1.0",
     category: "alert",
     enabled: config.enabled !== false,
@@ -204,7 +204,7 @@ function apply(ctx, config = {}) {
       }
       const message = buildMessage(cfg, payload);
       await sendMail(cfg, message);
-      ctx.logger?.info?.(`[dsh-security.attack-alert] alert sent to ${cfg.to} (${payload.type})`);
+      ctx.logger?.info?.(`[dsh-security.attack-alert] 告警已发送至 ${cfg.to} (${payload.type})`);
     },
   });
   ctx.effect(() => () => unregister(), "dsh-security.attack-alert teardown");

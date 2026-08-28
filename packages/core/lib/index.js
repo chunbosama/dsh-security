@@ -196,7 +196,7 @@ function apply(ctx, config = {}) {
       }
     }
     if (!dispatched) {
-      ctx.logger?.warn?.("[dsh-security] protection triggered but no attack-alert module is installed", payload?.type);
+      ctx.logger?.warn?.("[dsh-security] 已触发保护，但未安装攻击提醒模块", payload?.type);
     }
     return dispatched;
   };
